@@ -7,17 +7,17 @@ const Footer = () => {
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-10 h-10 rounded-lg bg-gradient-accent flex items-center justify-center">
-                <span className="text-2xl font-heading font-bold text-accent-foreground">P</span>
+                <span className="text-2xl font-heading font-bold text-accent-foreground">D</span>
               </div>
               <span className="text-2xl font-heading font-bold">
-                Pip <span className="text-accent">Syndicate</span>
+                Drpips<span className="text-accent">academy</span>
               </span>
             </div>
             <p className="text-muted-foreground max-w-md mb-4">
               Building a transparent, educational forex trading community. Master the markets together through real insights and professional strategies.
             </p>
             <p className="text-xs text-muted-foreground">
-              © 2025 Pip Syndicate. All rights reserved.
+              © 2025 Drpipsacademy. All rights reserved.
             </p>
           </div>
 
