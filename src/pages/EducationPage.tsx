@@ -1,10 +1,33 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Brain, LineChart, Shield, Play } from "lucide-react";
+import { BookOpen, Brain, LineChart, Shield, Play, CheckCircle2, Circle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { supabase } from "@/integrations/supabase/client";
+import { useVideoProgress } from "@/hooks/useVideoProgress";
+import { useNavigate } from "react-router-dom";
+import type { User } from "@supabase/supabase-js";
 
 const EducationPage = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
+  const { isVideoWatched, toggleVideoProgress, getWatchedCount, loading } = useVideoProgress(user?.id);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const topics = [
     {
       icon: LineChart,
@@ -30,36 +53,42 @@ const EducationPage = () => {
 
   const videos = [
     {
+      id: "video-1",
       title: "Forex Basics: Getting Started",
       description: "Learn the fundamentals of forex trading, currency pairs, and how the market works.",
       duration: "15:30",
       thumbnail: "gradient-primary",
     },
     {
+      id: "video-2",
       title: "Reading Price Action Like a Pro",
       description: "Master candlestick patterns, support/resistance, and trend identification.",
       duration: "22:45",
       thumbnail: "gradient-accent",
     },
     {
+      id: "video-3",
       title: "Risk Management Essentials",
       description: "Protect your capital with proper position sizing and stop-loss placement.",
       duration: "18:20",
       thumbnail: "gradient-primary",
     },
     {
+      id: "video-4",
       title: "Trading Psychology Masterclass",
       description: "Control emotions, avoid revenge trading, and develop a winning mindset.",
       duration: "25:10",
       thumbnail: "gradient-accent",
     },
     {
+      id: "video-5",
       title: "Building Your First Strategy",
       description: "Step-by-step guide to creating and testing your own trading system.",
       duration: "30:00",
       thumbnail: "gradient-primary",
     },
     {
+      id: "video-6",
       title: "Advanced Technical Indicators",
       description: "Deep dive into RSI, MACD, Bollinger Bands, and how to combine them.",
       duration: "28:15",
@@ -136,26 +165,81 @@ const EducationPage = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {videos.map((video, index) => (
-                <Card key={index} className="bg-card border-border hover:border-accent/50 transition-all duration-300 group cursor-pointer overflow-hidden">
-                  <div className={`aspect-video ${video.thumbnail} relative flex items-center justify-center`}>
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all" />
-                    <div className="relative z-10 w-16 h-16 rounded-full bg-accent/90 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Play className="w-8 h-8 text-accent-foreground ml-1" fill="currentColor" />
-                    </div>
-                    <div className="absolute bottom-3 right-3 bg-black/80 px-2 py-1 rounded text-xs text-white">
-                      {video.duration}
-                    </div>
-                  </div>
+            {user ? (
+              <div className="mb-8 max-w-2xl mx-auto">
+                <Card className="bg-card border-accent/30">
                   <CardHeader>
-                    <CardTitle className="text-lg group-hover:text-accent transition-colors">{video.title}</CardTitle>
+                    <CardTitle className="text-center">Your Learning Progress</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{video.description}</p>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Videos completed</span>
+                      <span className="font-heading font-bold text-accent">
+                        {getWatchedCount()} / {videos.length}
+                      </span>
+                    </div>
+                    <Progress value={(getWatchedCount() / videos.length) * 100} className="h-3" />
                   </CardContent>
                 </Card>
-              ))}
+              </div>
+            ) : (
+              <div className="mb-8 max-w-2xl mx-auto">
+                <Card className="bg-gradient-to-br from-primary/10 to-accent/5 border-accent/30">
+                  <CardContent className="py-8 text-center space-y-4">
+                    <p className="text-lg">Sign in to track your learning progress and mark videos as watched.</p>
+                    <Button onClick={() => navigate("/auth")} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                      Sign In to Track Progress
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {videos.map((video, index) => {
+                const watched = user ? isVideoWatched(video.id) : false;
+                
+                return (
+                  <Card key={index} className="bg-card border-border hover:border-accent/50 transition-all duration-300 group overflow-hidden">
+                    <div className={`aspect-video ${video.thumbnail} relative flex items-center justify-center`}>
+                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all" />
+                      <div className="relative z-10 w-16 h-16 rounded-full bg-accent/90 flex items-center justify-center group-hover:scale-110 transition-transform cursor-pointer">
+                        <Play className="w-8 h-8 text-accent-foreground ml-1" fill="currentColor" />
+                      </div>
+                      <div className="absolute bottom-3 right-3 bg-black/80 px-2 py-1 rounded text-xs text-white">
+                        {video.duration}
+                      </div>
+                      {user && (
+                        <div className="absolute top-3 right-3">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleVideoProgress(video.id);
+                            }}
+                            className="p-2 bg-black/80 rounded-full hover:bg-black/90 transition-colors"
+                            disabled={loading}
+                          >
+                            {watched ? (
+                              <CheckCircle2 className="w-5 h-5 text-accent" />
+                            ) : (
+                              <Circle className="w-5 h-5 text-white" />
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <CardHeader>
+                      <CardTitle className="text-lg group-hover:text-accent transition-colors flex items-center gap-2">
+                        {video.title}
+                        {watched && <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{video.description}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         </section>
