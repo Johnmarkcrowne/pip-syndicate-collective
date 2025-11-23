@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { useTheme } from "next-themes";
+import { Link, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,53 +35,66 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <div className="w-10 h-10 rounded-lg bg-gradient-accent flex items-center justify-center">
-              <span className="text-2xl font-heading font-bold text-accent-foreground">P</span>
+              <span className="text-2xl font-heading font-bold text-accent-foreground">D</span>
             </div>
             <span className="text-2xl font-heading font-bold">
-              Pip <span className="text-accent">Syndicate</span>
+              Drpips<span className="text-accent">academy</span>
             </span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <button
-              onClick={() => scrollToSection("about")}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection("dashboard")}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Dashboard
-            </button>
-            <button
-              onClick={() => scrollToSection("education")}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Education
-            </button>
-            <button
-              onClick={() => scrollToSection("community")}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Community
-            </button>
-            <button
-              onClick={() => scrollToSection("partner")}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Partner
-            </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Contact
-            </button>
+            {isHomePage ? (
+              <>
+                <button
+                  onClick={() => scrollToSection("about")}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  About
+                </button>
+                <button
+                  onClick={() => scrollToSection("dashboard")}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Dashboard
+                </button>
+                <Link
+                  to="/education"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Education
+                </Link>
+                <button
+                  onClick={() => scrollToSection("community")}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Community
+                </button>
+                <button
+                  onClick={() => scrollToSection("partner")}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Partner
+                </button>
+                <button
+                  onClick={() => scrollToSection("contact")}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Contact
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Home
+                </Link>
+                <Link to="/education" className="text-sm font-medium text-foreground">
+                  Education
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">
@@ -107,42 +123,64 @@ const Navbar = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden pb-6 space-y-4 animate-fade-in-up">
-            <button
-              onClick={() => scrollToSection("about")}
-              className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection("dashboard")}
-              className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Dashboard
-            </button>
-            <button
-              onClick={() => scrollToSection("education")}
-              className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Education
-            </button>
-            <button
-              onClick={() => scrollToSection("community")}
-              className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Community
-            </button>
-            <button
-              onClick={() => scrollToSection("partner")}
-              className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Partner
-            </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Contact
-            </button>
+            {isHomePage ? (
+              <>
+                <button
+                  onClick={() => scrollToSection("about")}
+                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  About
+                </button>
+                <button
+                  onClick={() => scrollToSection("dashboard")}
+                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Dashboard
+                </button>
+                <Link
+                  to="/education"
+                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Education
+                </Link>
+                <button
+                  onClick={() => scrollToSection("community")}
+                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Community
+                </button>
+                <button
+                  onClick={() => scrollToSection("partner")}
+                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Partner
+                </button>
+                <button
+                  onClick={() => scrollToSection("contact")}
+                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Contact
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/"
+                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Home
+                </Link>
+                <Link
+                  to="/education"
+                  className="block text-sm font-medium text-foreground"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Education
+                </Link>
+              </>
+            )}
           </div>
         )}
       </div>
