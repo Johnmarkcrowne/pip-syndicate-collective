@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExternalLink, BarChart3, Calendar, Newspaper } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useRef } from "react";
 
 const Dashboard = () => {
+  const chartContainerRef = useRef<HTMLDivElement>(null);
   const tools = [
     {
       icon: BarChart3,
@@ -30,6 +32,70 @@ const Dashboard = () => {
     { pair: "USD/JPY", change: "+0.15%", trending: "up" },
     { pair: "AUD/USD", change: "+0.33%", trending: "up" },
   ];
+
+  useEffect(() => {
+    if (!chartContainerRef.current) return;
+
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      "lineWidth": 2,
+      "lineType": 0,
+      "chartType": "area",
+      "fontColor": "rgb(106, 109, 120)",
+      "gridLineColor": "rgba(46, 46, 46, 0.06)",
+      "volumeUpColor": "rgba(34, 171, 148, 0.5)",
+      "volumeDownColor": "rgba(247, 82, 95, 0.5)",
+      "backgroundColor": "#ffffff",
+      "widgetFontColor": "#0F0F0F",
+      "upColor": "#22ab94",
+      "downColor": "#f7525f",
+      "borderUpColor": "#22ab94",
+      "borderDownColor": "#f7525f",
+      "wickUpColor": "#22ab94",
+      "wickDownColor": "#f7525f",
+      "colorTheme": "light",
+      "isTransparent": false,
+      "locale": "en",
+      "chartOnly": false,
+      "scalePosition": "right",
+      "scaleMode": "Normal",
+      "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
+      "valuesTracking": "1",
+      "changeMode": "price-and-percent",
+      "symbols": [
+        ["Apple", "NASDAQ:AAPL|1D"],
+        ["Google", "NASDAQ:GOOGL|1D"],
+        ["Microsoft", "NASDAQ:MSFT|1D"]
+      ],
+      "dateRanges": [
+        "1d|1",
+        "1m|30",
+        "3m|60",
+        "12m|1D",
+        "60m|1W",
+        "all|1M"
+      ],
+      "fontSize": "10",
+      "headerFontSize": "medium",
+      "autosize": true,
+      "width": "100%",
+      "height": "100%",
+      "noTimeScale": false,
+      "hideDateRanges": false,
+      "hideMarketStatus": false,
+      "hideSymbolLogo": false
+    });
+
+    chartContainerRef.current.appendChild(script);
+
+    return () => {
+      if (chartContainerRef.current) {
+        chartContainerRef.current.innerHTML = '';
+      }
+    };
+  }, []);
 
   return (
     <section id="dashboard" className="py-24 px-4 bg-muted/30">
@@ -99,15 +165,8 @@ const Dashboard = () => {
             <CardTitle className="text-2xl font-heading">Live Market Charts</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="w-full h-[600px] bg-muted/50 flex items-center justify-center">
-              <div className="text-center p-8">
-                <BarChart3 className="w-16 h-16 text-accent mx-auto mb-4" />
-                <p className="text-muted-foreground">
-                  TradingView widget integration available.
-                  <br />
-                  <span className="text-sm">Connect your TradingView account to view live charts.</span>
-                </p>
-              </div>
+            <div className="tradingview-widget-container w-full h-[600px]">
+              <div className="tradingview-widget-container__widget h-full" ref={chartContainerRef}></div>
             </div>
           </CardContent>
         </Card>
