@@ -1,10 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ExternalLink, BarChart3, Calendar, Newspaper } from "lucide-react";
+import { ExternalLink, BarChart3, Calendar, Newspaper, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Dashboard = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartCardRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const tools = [
     {
       icon: BarChart3,
@@ -67,7 +69,8 @@ const Dashboard = () => {
       "symbols": [
         ["Apple", "NASDAQ:AAPL|1D"],
         ["Google", "NASDAQ:GOOGL|1D"],
-        ["Microsoft", "NASDAQ:MSFT|1D"]
+        ["Microsoft", "NASDAQ:MSFT|1D"],
+        ["Gold", "OANDA:XAUUSD|1D"]
       ],
       "dateRanges": [
         "1d|1",
@@ -95,6 +98,27 @@ const Dashboard = () => {
         chartContainerRef.current.innerHTML = '';
       }
     };
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!chartCardRef.current) return;
+
+    if (!document.fullscreenElement) {
+      chartCardRef.current.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
   return (
@@ -160,12 +184,26 @@ const Dashboard = () => {
         </div>
 
         {/* TradingView Embed */}
-        <Card className="bg-card border-border overflow-hidden">
+        <Card ref={chartCardRef} className="bg-card border-border overflow-hidden">
           <CardHeader>
-            <CardTitle className="text-2xl font-heading">Live Market Charts</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl font-heading">Live Market Charts</CardTitle>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleFullscreen}
+                className="border-accent/50 text-accent hover:bg-accent/10"
+              >
+                {isFullscreen ? (
+                  <Minimize2 className="h-4 w-4" />
+                ) : (
+                  <Maximize2 className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="tradingview-widget-container w-full h-[600px]">
+            <div className={`tradingview-widget-container w-full ${isFullscreen ? 'h-[calc(100vh-80px)]' : 'h-[600px]'}`}>
               <div className="tradingview-widget-container__widget h-full" ref={chartContainerRef}></div>
             </div>
           </CardContent>
