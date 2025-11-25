@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 const Dashboard = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const candlestickContainerRef = useRef<HTMLDivElement>(null);
   const chartCardRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const tools = [
@@ -113,6 +114,71 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    if (!candlestickContainerRef.current) return;
+
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      "lineWidth": 2,
+      "lineType": 0,
+      "chartType": "candlesticks",
+      "fontColor": "rgb(106, 109, 120)",
+      "gridLineColor": "rgba(46, 46, 46, 0.06)",
+      "volumeUpColor": "rgba(34, 171, 148, 0.5)",
+      "volumeDownColor": "rgba(247, 82, 95, 0.5)",
+      "backgroundColor": "#ffffff",
+      "widgetFontColor": "#0F0F0F",
+      "upColor": "#22ab94",
+      "downColor": "#f7525f",
+      "borderUpColor": "#22ab94",
+      "borderDownColor": "#f7525f",
+      "wickUpColor": "#22ab94",
+      "wickDownColor": "#f7525f",
+      "colorTheme": "light",
+      "isTransparent": false,
+      "locale": "en",
+      "chartOnly": false,
+      "scalePosition": "right",
+      "scaleMode": "Normal",
+      "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
+      "valuesTracking": "1",
+      "changeMode": "price-and-percent",
+      "symbols": [
+        ["EUR/USD", "FX:EURUSD|1D"],
+        ["GBP/JPY", "FX:GBPJPY|1D"],
+        ["USD/JPY", "FX:USDJPY|1D"],
+        ["Gold", "OANDA:XAUUSD|1D"]
+      ],
+      "dateRanges": [
+        "1d|1",
+        "1m|30",
+        "3m|60",
+        "12m|1D",
+        "60m|1W",
+        "all|1M"
+      ],
+      "fontSize": "10",
+      "headerFontSize": "medium",
+      "autosize": true,
+      "width": "100%",
+      "height": "100%",
+      "noTimeScale": false,
+      "hideDateRanges": false,
+      "hideMarketStatus": false,
+      "hideSymbolLogo": false
+    });
+
+    candlestickContainerRef.current.appendChild(script);
+
+    return () => {
+      if (candlestickContainerRef.current) {
+        candlestickContainerRef.current.innerHTML = '';
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
@@ -183,31 +249,44 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* TradingView Embed */}
-        <Card ref={chartCardRef} className="bg-card border-border overflow-hidden">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-2xl font-heading">Live Market Charts</CardTitle>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={toggleFullscreen}
-                className="border-accent/50 text-accent hover:bg-accent/10"
-              >
-                {isFullscreen ? (
-                  <Minimize2 className="h-4 w-4" />
-                ) : (
-                  <Maximize2 className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className={`tradingview-widget-container w-full ${isFullscreen ? 'h-[calc(100vh-80px)]' : 'h-[600px]'}`}>
-              <div className="tradingview-widget-container__widget h-full" ref={chartContainerRef}></div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* TradingView Embeds */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <Card ref={chartCardRef} className="bg-card border-border overflow-hidden">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl font-heading">Area Charts</CardTitle>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={toggleFullscreen}
+                  className="border-accent/50 text-accent hover:bg-accent/10"
+                >
+                  {isFullscreen ? (
+                    <Minimize2 className="h-4 w-4" />
+                  ) : (
+                    <Maximize2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className={`tradingview-widget-container w-full ${isFullscreen ? 'h-[calc(100vh-80px)]' : 'h-[500px]'}`}>
+                <div className="tradingview-widget-container__widget h-full" ref={chartContainerRef}></div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border-border overflow-hidden">
+            <CardHeader>
+              <CardTitle className="text-2xl font-heading">Candlestick Charts</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="tradingview-widget-container w-full h-[500px]">
+                <div className="tradingview-widget-container__widget h-full" ref={candlestickContainerRef}></div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </section>
   );
