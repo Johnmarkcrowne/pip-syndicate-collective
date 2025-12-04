@@ -100,7 +100,7 @@ const AuthPage = () => {
           <Card className="bg-card border-border">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl font-heading">
-                Welcome to <span className="text-accent">Drpipsacademy</span>
+                Welcome to <span className="text-accent">FX Pulse</span>
               </CardTitle>
               <CardDescription>
                 Sign in or create an account to track your learning progress
