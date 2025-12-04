@@ -66,6 +66,12 @@ const Navbar = () => {
                 >
                   Education
                 </Link>
+                <Link
+                  to="/live-classes"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Live Classes
+                </Link>
                 <button
                   onClick={() => scrollToSection("community")}
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -90,8 +96,17 @@ const Navbar = () => {
                 <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   Home
                 </Link>
-                <Link to="/education" className="text-sm font-medium text-foreground">
+                <Link 
+                  to="/education" 
+                  className={`text-sm font-medium transition-colors ${location.pathname === "/education" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                >
                   Education
+                </Link>
+                <Link 
+                  to="/live-classes" 
+                  className={`text-sm font-medium transition-colors ${location.pathname === "/live-classes" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  Live Classes
                 </Link>
               </>
             )}
@@ -144,6 +159,13 @@ const Navbar = () => {
                 >
                   Education
                 </Link>
+                <Link
+                  to="/live-classes"
+                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Live Classes
+                </Link>
                 <button
                   onClick={() => scrollToSection("community")}
                   className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -174,10 +196,17 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/education"
-                  className="block text-sm font-medium text-foreground"
+                  className={`block text-sm font-medium transition-colors ${location.pathname === "/education" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Education
+                </Link>
+                <Link
+                  to="/live-classes"
+                  className={`block text-sm font-medium transition-colors ${location.pathname === "/live-classes" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Live Classes
                 </Link>
               </>
             )}
