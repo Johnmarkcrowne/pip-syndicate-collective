@@ -14,6 +14,191 @@ export type Database = {
   }
   public: {
     Tables: {
+      class_participants: {
+        Row: {
+          class_id: string
+          id: string
+          joined_at: string
+          left_at: string | null
+          user_id: string
+        }
+        Insert: {
+          class_id: string
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          user_id: string
+        }
+        Update: {
+          class_id?: string
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_participants_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_recordings: {
+        Row: {
+          class_id: string
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          recording_url: string
+          transcript: string | null
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          recording_url: string
+          transcript?: string | null
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          recording_url?: string
+          transcript?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_recordings_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classes: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          id: string
+          instructor_id: string | null
+          max_participants: number | null
+          room_id: string | null
+          scheduled_at: string
+          status: Database["public"]["Enums"]["class_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          instructor_id?: string | null
+          max_participants?: number | null
+          room_id?: string | null
+          scheduled_at: string
+          status?: Database["public"]["Enums"]["class_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          instructor_id?: string | null
+          max_participants?: number | null
+          room_id?: string | null
+          scheduled_at?: string
+          status?: Database["public"]["Enums"]["class_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hand_raise_queue: {
+        Row: {
+          acknowledged_at: string | null
+          class_id: string
+          id: string
+          position: number
+          raised_at: string
+          user_id: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          class_id: string
+          id?: string
+          position?: number
+          raised_at?: string
+          user_id: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          class_id?: string
+          id?: string
+          position?: number
+          raised_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hand_raise_queue_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          class_id: string | null
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          class_id?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          class_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -32,6 +217,60 @@ export type Database = {
           email?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          ends_at: string | null
+          id: string
+          starts_at: string
+          status: string
+          type: Database["public"]["Enums"]["subscription_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          starts_at?: string
+          status?: string
+          type: Database["public"]["Enums"]["subscription_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          starts_at?: string
+          status?: string
+          type?: Database["public"]["Enums"]["subscription_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -78,10 +317,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "instructor" | "moderator" | "student"
+      class_status: "scheduled" | "live" | "ended" | "cancelled"
+      subscription_type: "monthly" | "yearly" | "lifetime"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -208,6 +456,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "instructor", "moderator", "student"],
+      class_status: ["scheduled", "live", "ended", "cancelled"],
+      subscription_type: ["monthly", "yearly", "lifetime"],
+    },
   },
 } as const
