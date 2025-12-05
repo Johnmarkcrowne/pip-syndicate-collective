@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Moon, Sun, Menu, X, Settings } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Link, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { theme, setTheme } = useTheme();
   const location = useLocation();
   const isHomePage = location.pathname === "/";
@@ -18,6 +20,32 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    checkAdminStatus();
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      checkAdminStatus();
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const checkAdminStatus = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setIsAdmin(false);
+      return;
+    }
+
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    const hasAccess = roles?.some(r => r.role === 'instructor' || r.role === 'admin');
+    setIsAdmin(hasAccess || false);
+  };
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -90,6 +118,15 @@ const Navbar = () => {
                 >
                   Contact
                 </button>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="text-sm font-medium text-accent hover:text-accent/80 transition-colors flex items-center gap-1"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Admin
+                  </Link>
+                )}
               </>
             ) : (
               <>
@@ -108,6 +145,15 @@ const Navbar = () => {
                 >
                   Live Classes
                 </Link>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className={`text-sm font-medium transition-colors flex items-center gap-1 ${location.pathname === "/admin" ? "text-accent" : "text-accent hover:text-accent/80"}`}
+                  >
+                    <Settings className="h-4 w-4" />
+                    Admin
+                  </Link>
+                )}
               </>
             )}
           </div>
@@ -184,6 +230,18 @@ const Navbar = () => {
                 >
                   Contact
                 </button>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="block text-sm font-medium text-accent hover:text-accent/80 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="flex items-center gap-1">
+                      <Settings className="h-4 w-4" />
+                      Admin
+                    </span>
+                  </Link>
+                )}
               </>
             ) : (
               <>
@@ -208,6 +266,18 @@ const Navbar = () => {
                 >
                   Live Classes
                 </Link>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="block text-sm font-medium text-accent hover:text-accent/80 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="flex items-center gap-1">
+                      <Settings className="h-4 w-4" />
+                      Admin
+                    </span>
+                  </Link>
+                )}
               </>
             )}
           </div>
