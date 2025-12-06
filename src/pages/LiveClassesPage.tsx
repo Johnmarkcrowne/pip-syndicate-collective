@@ -111,11 +111,8 @@ const LiveClassesPage = () => {
       return;
     }
 
-    toast({
-      title: "Joining Class",
-      description: `Connecting to "${classItem.title}"...`,
-    });
-    // Video conferencing integration will go here
+    // Navigate to the classroom page
+    navigate(`/classroom/${classItem.id}`);
   };
 
   const days = eachDayOfInterval({
