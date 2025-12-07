@@ -67,10 +67,10 @@ const Dashboard = () => {
       "valuesTracking": "1",
       "changeMode": "price-and-percent",
       "symbols": [
-        ["Apple", "NASDAQ:AAPL|1D"],
-        ["Google", "NASDAQ:GOOGL|1D"],
-        ["Microsoft", "NASDAQ:MSFT|1D"],
-        ["Gold", "OANDA:XAUUSD|1D"]
+        ["Gold", "OANDA:XAUUSD|1D"],
+        ["EUR/USD", "OANDA:EURUSD|1D"],
+        ["GBP/USD", "OANDA:GBPUSD|1D"],
+        ["USD/JPY", "OANDA:USDJPY|1D"]
       ],
       "dateRanges": [
         "1d|1",
