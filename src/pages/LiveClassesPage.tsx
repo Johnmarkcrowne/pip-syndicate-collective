@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addMonths, subMonths } from "date-fns";
-import { Calendar, Video, Users, Clock, ChevronLeft, ChevronRight, Crown, Lock, Bell } from "lucide-react";
+import { Calendar, Video, Users, Clock, ChevronLeft, ChevronRight, Crown, Lock, Bell, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { SubscriptionPlans } from "@/components/SubscriptionPlans";
 
 interface LiveClass {
   id: string;
@@ -35,8 +36,24 @@ const LiveClassesPage = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showPlans, setShowPlans] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+
+  // Check for payment completion
+  useEffect(() => {
+    if (searchParams.get("payment") === "complete") {
+      toast({
+        title: "Payment Processing",
+        description: "Your payment is being processed. Your subscription will be activated shortly.",
+      });
+      // Refresh subscription after a delay
+      setTimeout(() => {
+        fetchSubscription();
+      }, 3000);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -209,7 +226,10 @@ const LiveClassesPage = () => {
                           <span className="font-bold text-accent">$499</span>
                         </div>
                       </div>
-                      <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
+                      <Button 
+                        onClick={() => setShowPlans(true)}
+                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                      >
                         Subscribe Now
                       </Button>
                     </div>
@@ -383,6 +403,21 @@ const LiveClassesPage = () => {
               </Card>
             </div>
           </div>
+
+          {/* Subscription Plans Section */}
+          {showPlans && !hasActiveSubscription && user && (
+            <div className="mt-12">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-heading font-bold mb-2">
+                  Choose Your <span className="text-accent">Plan</span>
+                </h2>
+                <p className="text-muted-foreground">
+                  Get unlimited access to all live classes and recordings
+                </p>
+              </div>
+              <SubscriptionPlans userEmail={user.email} />
+            </div>
+          )}
         </div>
       </main>
 

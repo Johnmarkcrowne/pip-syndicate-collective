@@ -199,6 +199,42 @@ export type Database = {
           },
         ]
       }
+      pending_subscriptions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          merchant_reference: string
+          order_tracking_id: string
+          status: string
+          subscription_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          merchant_reference: string
+          order_tracking_id: string
+          status?: string
+          subscription_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          merchant_reference?: string
+          order_tracking_id?: string
+          status?: string
+          subscription_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
