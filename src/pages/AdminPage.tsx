@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, Users, BarChart3, GraduationCap } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, BarChart3, GraduationCap, Crown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { ScheduleClassForm } from '@/components/admin/ScheduleClassForm';
 import { ClassesList } from '@/components/admin/ClassesList';
 import { ParticipantsList } from '@/components/admin/ParticipantsList';
 import { ClassAnalytics } from '@/components/admin/ClassAnalytics';
+import { SubscriptionManager } from '@/components/admin/SubscriptionManager';
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -73,7 +74,7 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="schedule" className="space-y-6">
-          <TabsList className="grid w-full max-w-lg grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="schedule" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               <span className="hidden sm:inline">Schedule</span>
@@ -81,6 +82,10 @@ export default function AdminPage() {
             <TabsTrigger value="participants" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Participants</span>
+            </TabsTrigger>
+            <TabsTrigger value="subscriptions" className="flex items-center gap-2">
+              <Crown className="h-4 w-4" />
+              <span className="hidden sm:inline">Subscriptions</span>
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -120,6 +125,18 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent>
                 <ParticipantsList />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="subscriptions">
+            <Card>
+              <CardHeader>
+                <CardTitle>Manage Subscriptions</CardTitle>
+                <CardDescription>Grant or revoke user subscriptions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SubscriptionManager />
               </CardContent>
             </Card>
           </TabsContent>
