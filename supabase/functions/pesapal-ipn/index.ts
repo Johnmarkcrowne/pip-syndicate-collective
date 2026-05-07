@@ -23,9 +23,11 @@ serve(async (req) => {
     const orderTrackingId = url.searchParams.get("OrderTrackingId");
     const orderMerchantReference = url.searchParams.get("OrderMerchantReference");
 
-    console.log("IPN received:", { orderTrackingId, orderMerchantReference });
+    console.log("IPN received");
 
-    if (!orderTrackingId) {
+    // Validate orderTrackingId format (UUID-like alphanumeric, max 64 chars)
+    const validId = /^[A-Za-z0-9-]{8,64}$/;
+    if (!orderTrackingId || !validId.test(orderTrackingId)) {
       return new Response(JSON.stringify({ status: "ok" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -113,7 +115,7 @@ serve(async (req) => {
     });
   } catch (error: any) {
     console.error("Pesapal IPN error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: "Internal error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

@@ -1,6 +1,17 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://esm.sh/zod@3.23.8";
+
+const NotificationSchema = z.object({
+  type: z.enum(["class_reminder", "class_starting", "welcome", "newsletter"]),
+  classId: z.string().uuid().optional(),
+  classTitle: z.string().max(200).optional(),
+  classTime: z.string().max(100).optional(),
+  userId: z.string().uuid().optional(),
+  email: z.string().trim().email().max(255).optional(),
+  name: z.string().trim().max(100).optional(),
+});
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -30,7 +41,16 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { type, classId, classTitle, classTime, userId, email, name }: NotificationRequest = await req.json();
+    let parsed: z.infer<typeof NotificationSchema>;
+    try {
+      parsed = NotificationSchema.parse(await req.json());
+    } catch (e) {
+      return new Response(JSON.stringify({ error: "Invalid request" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { type, classId, classTitle, classTime, userId, email, name } = parsed;
 
     console.log(`Processing ${type} notification request`);
 
@@ -172,7 +192,7 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in send-notification function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Failed to send notification" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

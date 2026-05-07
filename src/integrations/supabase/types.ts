@@ -123,6 +123,48 @@ export type Database = {
         }
         Relationships: []
       }
+      discipline_checks: {
+        Row: {
+          check_date: string
+          created_at: string
+          followed_plan: boolean | null
+          id: string
+          journaled_trades: boolean | null
+          no_revenge_trading: boolean | null
+          notes: string | null
+          risked_max_2_percent: boolean | null
+          updated_at: string
+          used_stop_loss: boolean | null
+          user_id: string
+        }
+        Insert: {
+          check_date?: string
+          created_at?: string
+          followed_plan?: boolean | null
+          id?: string
+          journaled_trades?: boolean | null
+          no_revenge_trading?: boolean | null
+          notes?: string | null
+          risked_max_2_percent?: boolean | null
+          updated_at?: string
+          used_stop_loss?: boolean | null
+          user_id: string
+        }
+        Update: {
+          check_date?: string
+          created_at?: string
+          followed_plan?: boolean | null
+          id?: string
+          journaled_trades?: boolean | null
+          no_revenge_trading?: boolean | null
+          notes?: string | null
+          risked_max_2_percent?: boolean | null
+          updated_at?: string
+          used_stop_loss?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       hand_raise_queue: {
         Row: {
           acknowledged_at: string | null
@@ -286,6 +328,93 @@ export type Database = {
           type?: Database["public"]["Enums"]["subscription_type"]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      trade_entries: {
+        Row: {
+          created_at: string
+          direction: string
+          entry_price: number | null
+          exit_price: number | null
+          id: string
+          lot_size: number | null
+          notes: string | null
+          pair: string
+          profit_loss: number
+          trade_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          entry_price?: number | null
+          exit_price?: number | null
+          id?: string
+          lot_size?: number | null
+          notes?: string | null
+          pair: string
+          profit_loss?: number
+          trade_date?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          entry_price?: number | null
+          exit_price?: number | null
+          id?: string
+          lot_size?: number | null
+          notes?: string | null
+          pair?: string
+          profit_loss?: number
+          trade_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trading_plans: {
+        Row: {
+          created_at: string
+          goals: string | null
+          id: string
+          max_loss: number | null
+          notes: string | null
+          pairs: string[] | null
+          profit_target: number | null
+          strategy: string | null
+          updated_at: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          goals?: string | null
+          id?: string
+          max_loss?: number | null
+          notes?: string | null
+          pairs?: string[] | null
+          profit_target?: number | null
+          strategy?: string | null
+          updated_at?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          goals?: string | null
+          id?: string
+          max_loss?: number | null
+          notes?: string | null
+          pairs?: string[] | null
+          profit_target?: number | null
+          strategy?: string | null
+          updated_at?: string
+          user_id?: string
+          week_start?: string
         }
         Relationships: []
       }
