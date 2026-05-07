@@ -1,5 +1,14 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://esm.sh/zod@3.23.8";
+
+const OrderSchema = z.object({
+  subscriptionType: z.enum(["monthly", "yearly", "lifetime"]),
+  email: z.string().trim().email().max(255),
+  firstName: z.string().trim().min(1).max(100),
+  lastName: z.string().trim().min(1).max(100),
+  phone: z.string().trim().max(20).optional(),
+});
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -52,18 +61,39 @@ serve(async (req) => {
 
     const token = tokenData.token;
 
-    // Get request body
-    const { subscriptionType, email, firstName, lastName, phone }: OrderRequest = await req.json();
+    // Validate request body
+    let body: z.infer<typeof OrderSchema>;
+    try {
+      body = OrderSchema.parse(await req.json());
+    } catch (e) {
+      return new Response(JSON.stringify({ error: "Invalid request" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { subscriptionType, email, firstName, lastName, phone } = body;
     const amount = PRICES[subscriptionType];
+
+    // Require authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const { data: { user: authedUser } } = await supabase.auth.getUser(
+      authHeader.replace("Bearer ", "")
+    );
+    if (!authedUser) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const merchantReference = `FXP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Get user from auth header
-    const authHeader = req.headers.get("Authorization");
-    let userId = null;
-    if (authHeader) {
-      const { data: { user } } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
-      userId = user?.id;
-    }
+    const userId = authedUser.id;
 
     // Register IPN URL first
     const ipnUrl = `${supabaseUrl}/functions/v1/pesapal-ipn`;
@@ -147,7 +177,7 @@ serve(async (req) => {
     });
   } catch (error: any) {
     console.error("Pesapal order error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: "Failed to create order" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
